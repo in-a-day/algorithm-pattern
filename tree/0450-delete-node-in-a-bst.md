@@ -89,3 +89,40 @@ class Solution {
 }
 ```
 
+
+
+递归解法: 
+
+首先查找需要删除的节点:
+
+1. 如果节点不存在右子树, 返回左子树
+2. 如果节点不存在左子树, 返回右子树
+3. 如果左右都存在, 将左子树移动到右子树的最左节点的左子树即可(这样可能会增加树的高度)
+
+```java
+class Solution {
+    public TreeNode deleteNode(TreeNode root, int key) {
+        if (root == null) return root;
+        if (key < root.val) {
+            root.left = deleteNode(root.left, key);
+        } else if (key > root.val) {
+            root.right = deleteNode(root.right, key);
+        } else {
+            // 返回右子树
+            if (root.left == null) return root.right;
+            // 返回左子树
+            if (root.right == null) return root.left;
+            TreeNode minOfRight =   root.right;
+            while (minOfRight.left != null) {
+                minOfRight = minOfRight.left;
+            }
+            // 删除节点的左子树移动到右子树最左节点
+            minOfRight.left = root.left;
+            // 返回删除节点的右子树
+            return root.right;
+        }
+        return root;
+    }
+}
+```
+
