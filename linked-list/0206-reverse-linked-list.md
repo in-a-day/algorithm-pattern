@@ -45,22 +45,17 @@ class Solution {
 
 ```java
 class Solution {
-    ListNode newHead;
     public ListNode reverseList(ListNode head) {
-        if (head == null) return head;
-        helper(head);
-        head.next = null;
-        return newHead;
+        return helper(head, null);
     }
     
-    
-    public ListNode helper(ListNode head) {
-        if (head == null || head.next == null) {
-            newHead = head;
-            return head;
+    private ListNode helper(ListNode cur, ListNode pre) {
+        if (cur == null) {
+            return pre;
         }
-        helper(head.next).next = head;
-        return head;
+        ListNode next = cur.next;
+        cur.next = pre;
+        return helper(next, cur);
     }
 }
 ```

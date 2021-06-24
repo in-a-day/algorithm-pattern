@@ -32,6 +32,27 @@ Output: [2,3]
 ```java
 class Solution {
     public ListNode deleteDuplicates(ListNode head) {
+        ListNode fakeNode = new ListNode(0);
+        fakeNode.next = head;
+        ListNode pre = fakeNode;
+        while (head != null && head.next != null) {
+            if (head.val == head.next.val) {
+                head = head.next;
+                if (head.next == null) {
+                    pre.next = null;
+                    re	turn fakeNode.next;
+                }
+                if (head.val != head.next.val) {
+                    // 例: 1 1 2 2, 将指针设置到2位置
+                    head = head.next;
+                }
+                pre.next = head;
+            } else {
+                head = head.next;
+                pre = pre.next;
+            }
+        }
+        return fakeNode.next;
     }
 }
 ```
