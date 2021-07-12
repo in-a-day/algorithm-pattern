@@ -41,40 +41,77 @@ Output: "accaccacc"
 ```java
 class Solution {
     public String decodeString(String s) {
-        Stack<String> stack = new Stack<>();
-        LinkedList<String> lst = new LinkedList();
-        for (char t : s.toCharArray()) {
-            if (']' == t) {
-                String popStr = String.valueOf(stack.pop());
-                StringBuilder sb = new StringBuilder();
-                while (!"[".equals(popStr)) {
-                    lst.addFirst(popStr);
-                    popStr = stack.pop();
-                }
-                while (!lst.isEmpty()) {
-                    sb.append(lst.poll());
-                }
-                // 需要重复的次数
-                int repeatTimes = Integer.valueOf(stack.pop());
-                String repeatStr = sb.toString();
-                StringBuilder r = new StringBuilder();
-                for (;repeatTimes > 0; repeatTimes--) {
-                    r.append(repeatStr);
-                }
-                stack.push(r.toString());
+        Stack<Character> stack = new Stack<>();
+        LinkedList<Character> lst = new LinkedList();
+        char[] chars = s.toCharArray();
+        for (char c : chars) {
+            if (']' != c) {
+                stack.push(c);
             } else {
-                stack.push(String.valueOf(t));
+                lst.clear();
+                char cur = stack.pop();
+                // 找出[]包围的字符
+                while ('[' != cur) {
+                    lst.addFirst(cur);
+                    cur = stack.pop();
+                }
+                // 找出需要重复的次数
+                cur = stack.pop();
+                int repeatTimes = 0;
+                for (int i = 1; Character.isDigit(cur); i *= 10) {
+                    repeatTimes += i;
+                    cur = stack.pop();
+                }
+                // 将重复字符放入栈中
+                for (; repeatTimes > 0; repeatTimes--) {
+                    for (char l : lst) {
+                        stack.push(l);
+                    }
+                }
             }
         }
-
         StringBuilder res = new StringBuilder();
         while (!stack.empty()) {
-            lst.addFirst(stack.pop());
+            res.append(stack.pop());
         }
-        while (!lst.isEmpty()) {
-            res.append(lst.poll());
-        }
-        return res.toString();
+        return res.reverse().toString();
     }
 }
 ```
+
+使用一个栈保存从'['到']'或者到'['中的字符，另一个栈保存对应需要重复的次数。
+
+```java
+class Solution {
+    public String decodeString(String s) {
+        Stack<StringBuilder> strs = new Stack<>();
+        Stack<StringBuilder> nums = new Stack<>();
+        strs.push(new StringBuilder());
+        nums.push(new StringBuilder());
+        for (char c : s.toCharArray()) {
+            if (Character.isDigit(c)) {
+                nums.peek().append(c);
+            } else if (c == '[') {
+                strs.push(new StringBuilder());
+                nums.push(new StringBuilder());
+            } else if (c == ']') {
+                int repeatition = Integer.valueOf(nums.pop().toString());
+                String repeatStr = strs.peek().toString();
+                for (int i = 0; i < repeatition; i++) {
+                    strs.peek().append(repeatStr);
+                }
+                // 当前字符串与前一个字符串合并
+                if (strs.size() != 1) {
+                    StringBuilder cur = strs.pop();
+                    strs.peek().append(cur);
+                }
+            } else {
+                // 字符
+                strs.peek().append(c);
+            }
+        }
+        return strs.pop().toString();
+    }
+}
+```
+
